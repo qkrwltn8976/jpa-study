@@ -5,6 +5,8 @@ import study.datajpa.entity.Member;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberJpaRepository {
@@ -16,6 +18,28 @@ public class MemberJpaRepository {
     public Member save(Member member) {
         em.persist(member);
         return member;
+    }
+
+    public void delete(Member member) {
+        em.remove(member);
+    }
+
+    // 전체를 조회하거나 특정 필터링이 필요한 경우 JPA의 JPQL 사용
+    // 객체를 대상으로 하는 쿼리
+    public List<Member> findAll() {
+        return em.createQuery("select m from Member m", Member.class)
+                .getResultList();
+    }
+
+    // Java8부터 Optional<T>클래스를 사용해 NullPointerException(이하 NPE)를 방지
+    public Optional<Member> findNById(Long id) {
+        Member member = em.find(Member.class, id);
+        return Optional.ofNullable(member); // member가 null일수도 있음
+    }
+
+    public long count() {
+        return em.createQuery("select count(m) from Member m", Long.class)
+                .getSingleResult(); // 단건조회
     }
 
     public Member find(Long id) {
